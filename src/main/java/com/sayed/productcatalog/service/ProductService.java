@@ -9,38 +9,32 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService {
+public class ProductService implements IProductService {
 
     @Autowired
     private ProductRepository productRepository;
 
-    // Get all products
+    @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // Add a new product
+    @Override
     public Product addProduct(Product product) {
         return productRepository.save(product);
     }
 
-    // Update an existing product
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
-            product.setName(updatedProduct.getName());
-            product.setPrice(updatedProduct.getPrice());
-            return productRepository.save(product);
-        } else {
-            return null; // Or throw exception depending on how you want to handle it
-        }
+    @Override
+    public Optional<Product> updateProduct(Long id, Product updatedProduct) {
+        return productRepository.findById(id).map(existingProduct -> {
+            existingProduct.setName(updatedProduct.getName());
+            existingProduct.setPrice(updatedProduct.getPrice());
+            return productRepository.save(existingProduct);
+        });
     }
 
-    // Delete a product
+    @Override
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
-
 }
